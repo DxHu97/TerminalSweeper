@@ -1,6 +1,6 @@
 class Tiles {
-  constructor(letter, num, value, isMine) {
-    this.value = value;
+  constructor(letter, num, isMine=false) {
+    this.value = 0;
     this.isPressed = false;
     this.isMine = isMine;
     this.isFlagged = false;

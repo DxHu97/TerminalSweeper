@@ -6,7 +6,6 @@ class Board {
         this.height = height;
         this.minesAmount = minesAmount;
         this.tiles = [];
-        this.surroundingTiles = {};
     }
 
     boardLayout(){
@@ -19,7 +18,9 @@ class Board {
             grid.push(row);
         }
         this.tiles = grid;
-        console.log(grid);
+        this.insertMines();
+        this.countMines();
+        console.log(this.tiles);
     }
 
     display(){
@@ -34,7 +35,9 @@ class Board {
                 let tile = this.tiles[j][i];
                 if (tile.isFlagged){
                     rowVal += '⚑ ';
-                } else if (tile.isPressed){
+                } else if (tile.isPressed && tile.isMine){
+                    rowVal += '💣 ';
+                } else if (tile.isPressed && !tile.isMine){
                     rowVal += (tile.value || ' ') + ' ';
                 } else {
                     rowVal += '☐ ';
@@ -59,26 +62,69 @@ class Board {
         const tile = this.tiles[row][col];
 
         if (action === 'flag') {
-            tile.isFlagged = !tile.isFlagged; 
+            tile.flagged(); 
         } else if (action === 'press') {
-            if (!tile.isFlagged) {
-                tile.isPressed = true; 
+            let tileVal = tile.pressed();
+            if (tileVal !== null) {
                 if(tile.isMine){
                     console.log('You pressed a bomb')
                 } else {
-                    tile.value = '5'
+                    tileVal = tile.value;
                 }
             }
         }
-
         console.log(this.display()); 
     }
+
+    insertMines() {
+        let count = 0;
+        while (count < this.minesAmount) {
+            const row = Math.floor(Math.random() * this.height);
+            const col = Math.floor(Math.random() * this.width);
+            if (!this.tiles[row][col].isMine) {
+                this.tiles[row][col].isMine = true;
+                count++;
+            }
+        }
+    }
+
+    countMines(){
+        for (let row = 0; row < this.height; row++) {
+            for (let col = 0; col < this.width; col++) {
+                if (this.tiles[row][col].isMine) {
+                    continue;
+                }
+                let mineCount = 0;
+                for (let i = -1; i <= 1; i++) {
+                    for (let j = -1; j <= 1; j++) {
+                        if (i === 0 && j === 0) continue;
+                        const newRow = row + i;
+                        const newCol = col + j;
+                        if (newRow >= 0 && newRow < this.height && newCol >= 0 && newCol < this.width) {
+                            if (this.tiles[newRow][newCol].isMine) {
+                                mineCount++;
+                            }
+                        }
+                    }
+                }
+                this.tiles[row][col].value = mineCount;
+            }
+        }
+   }
 }
 
-const boardthing = new Board(9,9);
+const boardthing = new Board(3,3,5);
 boardthing.boardLayout();
 console.log(boardthing.display());
 boardthing.setTileState('B', 1, 'press');
+boardthing.setTileState('B', 2, 'press');
+boardthing.setTileState('B', 3, 'press');
+boardthing.setTileState('A', 1, 'press');
+boardthing.setTileState('C', 1, 'press');
+boardthing.setTileState('C', 2, 'press');
+boardthing.setTileState('C', 3, 'press');
+boardthing.setTileState('A', 2, 'press');
+boardthing.setTileState('A', 3, 'press');
 
 
 module.exports = Board;
