@@ -6,6 +6,9 @@ class Board {
         this.height = height;
         this.minesAmount = minesAmount;
         this.tiles = [];
+        this.lose = false;
+        this.win = false;
+        this.pressedAmount = 0;
     }
 
     boardLayout(){
@@ -65,9 +68,12 @@ class Board {
             tile.flagged(); 
         } else if (action === 'press') {
             let tileVal = tile.pressed();
+            this.pressedAmount++;
             if (tileVal !== null) {
                 if(tile.isMine){
-                    console.log('You pressed a bomb')
+                    this.lose = true;
+                } else if (this.pressedAmount === this.width * this.height - this.minesAmount) {
+                    this.win = true;
                 } else {
                     tileVal = tile.value;
                 }
@@ -98,10 +104,10 @@ class Board {
                 for (let i = -1; i <= 1; i++) {
                     for (let j = -1; j <= 1; j++) {
                         if (i === 0 && j === 0) continue;
-                        const newRow = row + i;
-                        const newCol = col + j;
-                        if (newRow >= 0 && newRow < this.height && newCol >= 0 && newCol < this.width) {
-                            if (this.tiles[newRow][newCol].isMine) {
+                        const adjacentRow = row + i;
+                        const adjacentCol = col + j;
+                        if (adjacentRow >= 0 && adjacentRow < this.height && adjacentCol >= 0 && adjacentCol < this.width) {
+                            if (this.tiles[adjacentRow][adjacentCol].isMine) {
                                 mineCount++;
                             }
                         }
@@ -125,6 +131,5 @@ boardthing.setTileState('C', 2, 'press');
 boardthing.setTileState('C', 3, 'press');
 boardthing.setTileState('A', 2, 'press');
 boardthing.setTileState('A', 3, 'press');
-
 
 module.exports = Board;
