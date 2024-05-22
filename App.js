@@ -2,9 +2,9 @@ const Board = require('./Board.js');
 const prompt = require('prompt-sync')();
 
 function main() {
-    const width = 2;  
-    const height = 2; 
-    const minesAmount = 3; 
+    const width = 5;  
+    const height = 5; 
+    const minesAmount = 2; 
 
     const board = new Board(width, height, minesAmount);
     board.boardLayout();

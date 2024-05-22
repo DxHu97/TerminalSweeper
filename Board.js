@@ -35,10 +35,10 @@ class Board {
             let rowVal = (i + 1) + ' ';
             for (let j = 0; j < this.width; j++){
                 let tile = this.tiles[j][i];
-                if (tile.isFlagged){
-                    rowVal += '⚑ ';
-                } else if (tile.isPressed && tile.isMine){
+                if (this.lose && tile.isMine){
                     rowVal += '💣 ';
+                } else if (tile.isFlagged){
+                    rowVal += '⚑ ';
                 } else if (tile.isPressed && !tile.isMine){
                     rowVal += (tile.value || ' ') + ' ';
                 } else {
@@ -64,26 +64,26 @@ class Board {
         const tile = this.tiles[row][col];
 
         if (action === 'flag') {
-            tile.flagged(); 
+            tile.flagged();
         } else if (action === 'press') {
-            if (this.firstClick){
-                this.insertMines(row,col);
+            if (this.firstClick) {
+                this.insertMines(row, col);
                 this.countMines();
                 this.firstClick = false;
             }
-            let tileVal = tile.pressed();
-            this.pressedAmount++;
-            if (tileVal !== null) {
-                if(tile.isMine){
-                    this.lose = true;
-                } else if (this.pressedAmount === this.width * this.height - this.minesAmount) {
-                    this.win = true;
-                } else {
-                    tileVal = tile.value;
-                }
+            
+            if (!tile.isPressed) {
+                this.revealTiles(row, col);
+            }
+
+            if (tile.isMine) {
+                this.lose = true;
+            } else if (this.pressedAmount === this.width * this.height - this.minesAmount) {
+                this.win = true;
             }
         }
-        console.log(this.display()); 
+        
+        console.log(this.display());
     }
 
     insertMines(firstRow, firstCol) {
@@ -121,6 +121,26 @@ class Board {
             }
         }
    }
+   revealTiles(row, col) {
+    const tile = this.tiles[row][col];
+    if(!tile.isPressed && !tile.isMine && !tile.isFlagged){
+        tile.isPressed = true;
+        this.pressedAmount++;
+        if(tile.value === 0){
+            for(let i = -1; i <= 1; i++){
+                for (let j = -1; j <= 1; j++){
+                    if (i=== 0 && j=== 0) continue;
+                    const adjacentRow = row + i;
+                    const adjacentCol = col + j;
+                    if (adjacentRow >= 0 && adjacentRow < this.height && adjacentCol >=0 && adjacentCol < this.width){
+                        this.revealTiles(adjacentRow, adjacentCol);
+                    }
+                }
+            }
+        
+        }
+    }
+}
 }
 
 /*const boardthing = new Board(3,3,5);
