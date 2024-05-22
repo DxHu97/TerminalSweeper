@@ -66,12 +66,12 @@ class Board {
         if (action === 'flag') {
             tile.flagged(); 
         } else if (action === 'press') {
-            let tileVal = tile.pressed();
             if (this.firstClick){
-                this.insertMines();
+                this.insertMines(row,col);
                 this.countMines();
                 this.firstClick = false;
             }
+            let tileVal = tile.pressed();
             this.pressedAmount++;
             if (tileVal !== null) {
                 if(tile.isMine){
@@ -86,12 +86,12 @@ class Board {
         console.log(this.display()); 
     }
 
-    insertMines() {
+    insertMines(firstRow, firstCol) {
         let count = 0;
         while (count < this.minesAmount) {
             const row = Math.floor(Math.random() * this.height);
             const col = Math.floor(Math.random() * this.width);
-            if (!this.tiles[row][col].isMine) {
+            if ((row !== firstRow || col !== firstCol) && !this.tiles[row][col].isMine) {
                 this.tiles[row][col].isMine = true;
                 count++;
             }
@@ -123,7 +123,7 @@ class Board {
    }
 }
 
-const boardthing = new Board(3,3,5);
+/*const boardthing = new Board(3,3,5);
 boardthing.boardLayout();
 console.log(boardthing.display());
 boardthing.setTileState('B', 1, 'press');
@@ -135,5 +135,5 @@ boardthing.setTileState('C', 2, 'press');
 boardthing.setTileState('C', 3, 'press');
 boardthing.setTileState('A', 2, 'press');
 boardthing.setTileState('A', 3, 'press');
-
+*/
 module.exports = Board;
