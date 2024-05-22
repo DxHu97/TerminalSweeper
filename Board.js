@@ -9,6 +9,7 @@ class Board {
         this.lose = false;
         this.win = false;
         this.pressedAmount = 0;
+        this.firstClick = true;
     }
 
     boardLayout(){
@@ -21,8 +22,6 @@ class Board {
             grid.push(row);
         }
         this.tiles = grid;
-        this.insertMines();
-        this.countMines();
         console.log(this.tiles);
     }
 
@@ -68,6 +67,11 @@ class Board {
             tile.flagged(); 
         } else if (action === 'press') {
             let tileVal = tile.pressed();
+            if (this.firstClick){
+                this.insertMines();
+                this.countMines();
+                this.firstClick = false;
+            }
             this.pressedAmount++;
             if (tileVal !== null) {
                 if(tile.isMine){
